@@ -1,9 +1,17 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { ConversationList } from '@/components/conversations/ConversationList'
+import { SearchBar } from '@/components/search/SearchBar'
+import { FilterPanel } from '@/components/filters/FilterPanel'
 import { FileArchive, Library } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useFilterStore } from '@/store/useFilterStore'
 
 export function Sidebar() {
+  const location = useLocation()
+  const isLibrary = location.pathname === '/library'
+  const searchQuery = useFilterStore((s) => s.searchQuery)
+  const setSearchQuery = useFilterStore((s) => s.setSearchQuery)
+
   return (
     <aside className="w-72 shrink-0 border-r border-border bg-card flex flex-col min-h-screen">
       <nav className="p-2 border-b border-border flex gap-1">
@@ -32,6 +40,17 @@ export function Sidebar() {
           Library
         </NavLink>
       </nav>
+      {isLibrary && (
+        <>
+          <div className="p-2 border-b border-border">
+            <SearchBar
+              value={searchQuery}
+              onChange={setSearchQuery}
+            />
+          </div>
+          <FilterPanel defaultOpen={true} />
+        </>
+      )}
       <div className="flex-1 overflow-hidden flex flex-col min-h-0">
         <ConversationList />
       </div>

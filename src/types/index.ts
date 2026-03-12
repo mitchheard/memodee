@@ -10,6 +10,8 @@ export interface Conversation {
   isArchived: boolean
   summary?: string
   embeddingId?: string
+  firstMessageSnippet?: string
+  hasCode?: boolean
 }
 
 export interface Message {

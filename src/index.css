@@ -126,4 +126,7 @@
   html {
     @apply font-sans;
     }
+  mark {
+    @apply bg-primary/30 rounded px-0.5;
+  }
 }

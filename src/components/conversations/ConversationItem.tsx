@@ -1,10 +1,13 @@
 import { cn } from '@/lib/utils'
+import { highlightMatches } from '@/lib/search'
 import type { Conversation } from '@/types'
+import type { SearchResult } from '@/lib/search'
 
 interface ConversationItemProps {
   conversation: Conversation
   isActive: boolean
   onSelect: () => void
+  searchResult?: SearchResult
 }
 
 function formatRelative(date: Date): string {
@@ -27,7 +30,13 @@ function modelBadge(model: string): string {
   return model.split('/').pop() ?? model
 }
 
-export function ConversationItem({ conversation, isActive, onSelect }: ConversationItemProps) {
+export function ConversationItem({ conversation, isActive, onSelect, searchResult }: ConversationItemProps) {
+  const titleMatch = searchResult?.matches?.find((m) => m.key === 'title')
+  const titleDisplay =
+    titleMatch?.indices?.length && titleMatch.indices.length > 0
+      ? highlightMatches(conversation.title || 'Untitled', titleMatch.indices)
+      : conversation.title || 'Untitled'
+
   return (
     <button
       type="button"
@@ -39,7 +48,13 @@ export function ConversationItem({ conversation, isActive, onSelect }: Conversat
       )}
     >
       <div className="flex items-center gap-2 min-w-0">
-        <span className="truncate font-medium text-sm flex-1">{conversation.title || 'Untitled'}</span>
+        <span className="truncate font-medium text-sm flex-1">
+          {titleMatch?.indices?.length ? (
+            <span dangerouslySetInnerHTML={{ __html: titleDisplay }} />
+          ) : (
+            titleDisplay
+          )}
+        </span>
         <span className="shrink-0 text-xs text-muted-foreground">
           {formatRelative(conversation.updatedAt)}
         </span>

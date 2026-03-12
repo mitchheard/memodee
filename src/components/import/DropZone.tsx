@@ -66,7 +66,7 @@ export function DropZone({ onFile, disabled, className }: DropZoneProps) {
             Drop your ChatGPT export ZIP here
           </p>
           <p className="text-sm text-muted-foreground">
-            or click to browse. The file should contain <code className="rounded bg-muted px-1">conversations.json</code>.
+            or click to browse. The ZIP should contain <code className="rounded bg-muted px-1">conversations.json</code>, <code className="rounded bg-muted px-1">shared_conversations.json</code>, or <code className="rounded bg-muted px-1">conversations-000.json</code> (and similar).
           </p>
         </div>
         <input

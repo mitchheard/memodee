@@ -15,6 +15,8 @@ function toConversation(row: Record<string, unknown>): Conversation {
     isArchived: (row.isArchived as boolean) ?? false,
     summary: row.summary as string | undefined,
     embeddingId: row.embeddingId as string | undefined,
+    firstMessageSnippet: row.firstMessageSnippet as string | undefined,
+    hasCode: row.hasCode as boolean | undefined,
   }
 }
 
