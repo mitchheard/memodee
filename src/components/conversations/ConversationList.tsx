@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { useSearch } from '@/hooks/useSearch'
 import { useConversationStore } from '@/store/useConversationStore'
 import { useFilterStore } from '@/store/useFilterStore'
@@ -15,7 +16,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+
+const ROW_HEIGHT_ESTIMATE = 56
+const OVERSCAN = 5
+
 export function ConversationList() {
+  const parentRef = useRef<HTMLDivElement>(null)
   const { conversations, searchResults, isLoading } = useSearch()
   const activeConversationId = useConversationStore((s) => s.activeConversationId)
   const setActiveConversationId = useConversationStore((s) => s.setActiveConversationId)
@@ -61,6 +67,13 @@ export function ConversationList() {
     )
   }
 
+  const virtualizer = useVirtualizer({
+    count: conversations.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT_ESTIMATE,
+    overscan: OVERSCAN,
+  })
+
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {selectedIds.size > 0 && (
@@ -82,18 +95,37 @@ export function ConversationList() {
           </div>
         </div>
       )}
-      <div className="flex flex-col gap-0.5 overflow-auto flex-1">
-        {conversations.map((conv) => (
-          <ConversationItem
-            key={conv.id}
-            conversation={conv}
-            isActive={activeConversationId === conv.id}
-            isSelected={selectedIds.has(conv.id)}
-            onSelect={() => setActiveConversationId(conv.id)}
-            onToggleSelect={() => toggleSelection(conv.id)}
-            searchResult={searchResults.get(conv.id)}
-          />
-        ))}
+      <div
+        ref={parentRef}
+        className="flex-1 overflow-auto min-h-0"
+      >
+        <div
+          className="w-full relative"
+          style={{ height: `${virtualizer.getTotalSize()}px` }}
+        >
+          {virtualizer.getVirtualItems().map((virtualRow) => {
+            const conv = conversations[virtualRow.index]
+            return (
+              <div
+                key={conv.id}
+                className="absolute left-0 top-0 w-full px-1 pb-0.5"
+                style={{
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${virtualRow.start}px)`,
+                }}
+              >
+                <ConversationItem
+                  conversation={conv}
+                  isActive={activeConversationId === conv.id}
+                  isSelected={selectedIds.has(conv.id)}
+                  onSelect={() => setActiveConversationId(conv.id)}
+                  onToggleSelect={() => toggleSelection(conv.id)}
+                  searchResult={searchResults.get(conv.id)}
+                />
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
