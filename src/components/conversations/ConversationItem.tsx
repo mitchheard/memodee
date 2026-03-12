@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { highlightMatches } from '@/lib/search'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { Conversation } from '@/types'
 import type { SearchResult } from '@/lib/search'
 
 interface ConversationItemProps {
   conversation: Conversation
   isActive: boolean
+  isSelected: boolean
   onSelect: () => void
+  onToggleSelect: () => void
   searchResult?: SearchResult
 }
 
@@ -30,7 +34,10 @@ function modelBadge(model: string): string {
   return model.split('/').pop() ?? model
 }
 
-export function ConversationItem({ conversation, isActive, onSelect, searchResult }: ConversationItemProps) {
+export function ConversationItem({ conversation, isActive, isSelected, onSelect, onToggleSelect, searchResult }: ConversationItemProps) {
+  const [hover, setHover] = useState(false)
+  const showCheckbox = hover || isSelected
+
   const titleMatch = searchResult?.matches?.find((m) => m.key === 'title')
   const titleDisplay =
     titleMatch?.indices?.length && titleMatch.indices.length > 0
@@ -38,15 +45,30 @@ export function ConversationItem({ conversation, isActive, onSelect, searchResul
       : conversation.title || 'Untitled'
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
+      onKeyDown={(e) => e.key === 'Enter' && onSelect()}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
       className={cn(
-        'w-full text-left px-3 py-2.5 rounded-lg transition-colors',
+        'group w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-start gap-2 cursor-pointer',
         'hover:bg-muted/80',
         isActive && 'bg-muted'
       )}
     >
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={(e) => { e.stopPropagation(); onToggleSelect() }}
+        onKeyDown={(e) => e.key === 'Enter' && e.stopPropagation()}
+        className={cn('shrink-0 pt-0.5', !showCheckbox && 'opacity-0 group-hover:opacity-100')}
+        aria-label={isSelected ? 'Deselect' : 'Select'}
+      >
+        <Checkbox checked={isSelected} />
+      </div>
+      <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 min-w-0">
         <span className="truncate font-medium text-sm flex-1">
           {titleMatch?.indices?.length ? (
@@ -65,6 +87,7 @@ export function ConversationItem({ conversation, isActive, onSelect, searchResul
         </span>
         <span className="text-xs text-muted-foreground">{conversation.messageCount} messages</span>
       </div>
-    </button>
+      </div>
+    </div>
   )
 }

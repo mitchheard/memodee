@@ -59,23 +59,30 @@ function getOrderedNodeIds(
 /**
  * Parse one ChatGPT export conversation into Conversation + Message[].
  * Supports (1) mapping tree format, (2) flat messages array when mapping is missing.
+ * Accepts id or conversation_id; title/create_time/update_time are optional.
  */
 export function parseConversation(
   raw: ChatGPTExportConversation & { messages?: Array<{ role?: string; content?: string; id?: string; create_time?: number }> }
 ): { conversation: Conversation; messages: Message[] } | null {
-  const mapping = raw.mapping ?? {}
-  const rootId = findRootId(mapping)
+  const convId = raw.id ?? (raw as { conversation_id?: string }).conversation_id
+  if (!convId) return null
+  const normalized = { ...raw, id: convId } as typeof raw
+  const mapping = normalized.mapping ?? {}
+  let rootId = findRootId(mapping)
+  // Some exports (e.g. API-style) use current_node as the thread head when parent chain differs
+  const currentNode = (normalized as { current_node?: string }).current_node
+  if (rootId == null && currentNode && mapping[currentNode]) rootId = currentNode
 
   if (rootId != null) {
-    const fromMapping = parseFromMapping(raw, mapping, rootId)
+    const fromMapping = parseFromMapping(normalized, mapping, rootId)
     if (fromMapping) return fromMapping
   }
 
   // Fallback: flat messages array (e.g. some shared_conversations.json exports)
-  const rawMessages = (raw as { messages?: unknown[] }).messages
+  const rawMessages = (normalized as { messages?: unknown[] }).messages
   if (Array.isArray(rawMessages) && rawMessages.length > 0) {
     return parseFromFlatMessages(
-      raw,
+      normalized,
       rawMessages as Array<{ role?: string; content?: string | { parts?: string[] }; id?: string; create_time?: number }>
     )
   }

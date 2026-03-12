@@ -58,8 +58,10 @@ export interface ChatGPTExportNode {
 
 export interface ChatGPTExportConversation {
   id: string
-  title: string
-  create_time: number
-  update_time: number
+  /** Alternate field in some exports (e.g. API / shared-conversations). */
+  conversation_id?: string
+  title?: string
+  create_time?: number
+  update_time?: number
   mapping?: Record<string, ChatGPTExportNode>
 }

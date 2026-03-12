@@ -1,11 +1,40 @@
+import { useState } from 'react'
 import { useConversation, useMessages } from '@/hooks/useConversations'
 import { useConversationStore } from '@/store/useConversationStore'
+import { deleteConversation, toggleStar } from '@/lib/conversationActions'
 import { MessageBubble } from './MessageBubble'
+import { ExportMenu } from '@/components/actions/ExportMenu'
+import { Button } from '@/components/ui/button'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Star, Trash2 } from 'lucide-react'
 
 export function ConversationView() {
   const activeConversationId = useConversationStore((s) => s.activeConversationId)
+  const setActiveConversationId = useConversationStore((s) => s.setActiveConversationId)
   const { conversation, isLoading: convLoading } = useConversation(activeConversationId)
   const { messages, isLoading: msgLoading } = useMessages(activeConversationId)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+
+  const handleStar = async () => {
+    if (!conversation) return
+    await toggleStar(conversation.id, conversation.isStarred)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!activeConversationId) return
+    await deleteConversation(activeConversationId)
+    setActiveConversationId(null)
+    setDeleteDialogOpen(false)
+  }
 
   if (activeConversationId == null) {
     return (
@@ -34,16 +63,58 @@ export function ConversationView() {
   return (
     <div className="flex flex-col h-full">
       <header className="shrink-0 border-b border-border px-4 py-3">
-        <h1 className="font-semibold text-lg">{conversation.title || 'Untitled'}</h1>
-        <p className="text-sm text-muted-foreground">
-          {conversation.messageCount} messages · {conversation.model}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="font-semibold text-lg truncate">{conversation.title || 'Untitled'}</h1>
+            <p className="text-sm text-muted-foreground">
+              {conversation.messageCount} messages · {conversation.model}
+            </p>
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleStar}
+              className={conversation.isStarred ? 'text-primary' : ''}
+              aria-label={conversation.isStarred ? 'Unstar' : 'Star'}
+            >
+              <Star className={`size-4 ${conversation.isStarred ? 'fill-current' : ''}`} />
+            </Button>
+            <ExportMenu conversation={conversation} messages={messages} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setDeleteDialogOpen(true)}
+              aria-label="Delete"
+              className="text-destructive hover:text-destructive"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
+        </div>
       </header>
       <div className="flex-1 overflow-auto p-4 space-y-4">
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
       </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete conversation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this conversation and all its messages. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

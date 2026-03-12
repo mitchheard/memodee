@@ -8,21 +8,30 @@ const CONVERSATION_BATCH = 100
 const MESSAGE_BATCH = 500
 
 // ChatGPT export may use: single file or numbered files (conversations-000.json, …)
-const CONVERSATIONS_FILENAMES = ['conversations.json', 'shared_conversations.json']
+const CONVERSATIONS_FILENAMES = ['conversations.json']
 const NUMBERED_PATTERN = /conversations-(\d+)\.json$/i
+
+/** Ensure each conversation has id (use conversation_id when id is missing). */
+function ensureConversationId(c: Record<string, unknown>): ChatGPTExportConversation {
+  const id = (c.id ?? c.conversation_id) as string | undefined
+  return id != null ? { ...c, id } as ChatGPTExportConversation : (c as unknown as ChatGPTExportConversation)
+}
 
 /** Unwrap export JSON: accept top-level array or object with conversations/data/items array, or single conversation object. */
 function normalizeToConversationArray(parsed: unknown): ChatGPTExportConversation[] {
-  if (Array.isArray(parsed)) return parsed as ChatGPTExportConversation[]
+  if (Array.isArray(parsed)) {
+    return (parsed as Record<string, unknown>[]).map(ensureConversationId)
+  }
   if (parsed && typeof parsed === 'object') {
     const obj = parsed as Record<string, unknown>
     for (const key of ['conversations', 'data', 'items']) {
       const val = obj[key]
-      if (Array.isArray(val)) return val as ChatGPTExportConversation[]
+      if (Array.isArray(val)) return (val as Record<string, unknown>[]).map(ensureConversationId)
     }
-    // Single conversation object (e.g. in conversations-000.json)
-    if (typeof obj.id === 'string' && (obj.mapping != null || obj.messages != null)) {
-      return [obj as ChatGPTExportConversation]
+    // Single conversation object (e.g. in conversations-000.json or API-style with conversation_id)
+    const id = obj.id ?? obj.conversation_id
+    if (typeof id === 'string' && (obj.mapping != null || obj.messages != null)) {
+      return [ensureConversationId(obj)]
     }
   }
   return []
@@ -104,7 +113,10 @@ export function useImport() {
       const { conversations, messages } = parseExport(raw)
 
       if (conversations.length === 0) {
-        setProgress({ stage: 'done', message: 'No valid conversations found' })
+        const hint = raw.length > 0
+          ? ` (${raw.length} item(s) in file had no extractable messages)`
+          : ''
+        setProgress({ stage: 'done', message: `No valid conversations found${hint}` })
         return { count: 0 }
       }
 
