@@ -39,21 +39,35 @@ function findRootId(mapping: Record<string, ChatGPTExportNode>): string | null {
 }
 
 /**
- * Walk mapping following children[0] from root to get ordered node ids.
+ * Collect all node ids reachable from root (walk full tree via all children).
+ * Returns ids in chronological order by message create_time so the full conversation is preserved.
  */
-function getOrderedNodeIds(
+function getAllNodeIdsInOrder(
   mapping: Record<string, ChatGPTExportNode>,
   rootId: string
 ): string[] {
-  const ordered: string[] = []
-  let currentId: string | null = rootId
-  while (currentId) {
-    ordered.push(currentId)
-    const node: ChatGPTExportNode | undefined = mapping[currentId]
-    const nextId: string | undefined = node?.children?.[0]
-    currentId = nextId && mapping[nextId] ? nextId : null
+  const collected: string[] = []
+  const visited = new Set<string>()
+  function walk(id: string) {
+    if (visited.has(id)) return
+    visited.add(id)
+    collected.push(id)
+    const node = mapping[id]
+    const children = node?.children
+    if (Array.isArray(children)) {
+      for (const childId of children) {
+        if (mapping[childId]) walk(childId)
+      }
+    }
   }
-  return ordered
+  walk(rootId)
+  // Sort by message create_time so order is chronological
+  collected.sort((aId, bId) => {
+    const aTime = mapping[aId]?.message?.create_time ?? 0
+    const bTime = mapping[bId]?.message?.create_time ?? 0
+    return aTime - bTime
+  })
+  return collected
 }
 
 /**
@@ -95,7 +109,7 @@ function parseFromMapping(
   mapping: Record<string, ChatGPTExportNode>,
   rootId: string
 ): { conversation: Conversation; messages: Message[] } | null {
-  const nodeIds = getOrderedNodeIds(mapping, rootId)
+  const nodeIds = getAllNodeIdsInOrder(mapping, rootId)
   const messages: Message[] = []
   let model = 'unknown'
   let firstUserSnippet: string | null = null

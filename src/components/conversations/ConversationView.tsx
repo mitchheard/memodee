@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { useConversation, useMessages } from '@/hooks/useConversations'
@@ -31,6 +31,11 @@ export function ConversationView() {
   const { messages, isLoading: msgLoading } = useMessages(activeConversationId)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [notionSharing, setNotionSharing] = useState(false)
+  const messagesScrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesScrollRef.current?.scrollTo({ top: 0 })
+  }, [activeConversationId])
 
   const handleStar = async () => {
     if (!conversation) return
@@ -92,7 +97,7 @@ export function ConversationView() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full min-w-0 flex-1">
       <header className="shrink-0 border-b border-border px-4 py-3">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
@@ -134,7 +139,10 @@ export function ConversationView() {
           </div>
         </div>
       </header>
-      <div className="flex-1 overflow-auto p-4 space-y-4">
+      <div
+        ref={messagesScrollRef}
+        className="flex-1 overflow-auto p-4 space-y-4"
+      >
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}

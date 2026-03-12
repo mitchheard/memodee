@@ -12,7 +12,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
   return (
     <div
       className={cn(
-        'rounded-lg px-4 py-3 max-w-[85%]',
+        'rounded-lg px-4 py-3 max-w-[85%] min-w-0 overflow-hidden',
         isUser && 'ml-auto bg-primary text-primary-foreground',
         isAssistant && 'mr-auto bg-muted',
         (message.role === 'system' || message.role === 'tool') && 'mr-auto bg-muted/70 text-muted-foreground text-sm'
