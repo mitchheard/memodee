@@ -1,0 +1,39 @@
+[
+  {
+    "id": "sample-conv-1",
+    "title": "Sample conversation",
+    "create_time": 1700000000,
+    "update_time": 1700001000,
+    "mapping": {
+      "root": {
+        "id": "root",
+        "message": null,
+        "parent": null,
+        "children": ["node-1"]
+      },
+      "node-1": {
+        "id": "node-1",
+        "message": {
+          "id": "msg-1",
+          "author": { "role": "user" },
+          "content": { "content_type": "text", "parts": ["Hello, what is 2+2?"] },
+          "create_time": 1700000000
+        },
+        "parent": "root",
+        "children": ["node-2"]
+      },
+      "node-2": {
+        "id": "node-2",
+        "message": {
+          "id": "msg-2",
+          "author": { "role": "assistant" },
+          "content": { "content_type": "text", "parts": ["2+2 equals 4."] },
+          "create_time": 1700000001,
+          "metadata": { "model_slug": "gpt-4" }
+        },
+        "parent": "node-1",
+        "children": []
+      }
+    }
+  }
+]
