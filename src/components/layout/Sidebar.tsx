@@ -4,13 +4,14 @@ import { SearchBar } from '@/components/search/SearchBar'
 import { FilterPanel } from '@/components/filters/FilterPanel'
 import { FileArchive, Library, BarChart3, Settings as SettingsIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useFilterStore } from '@/store/useFilterStore'
+import { useSearchContext } from '@/contexts/SearchContext'
+import { useSettingsStore } from '@/store/useSettingsStore'
 
 export function Sidebar() {
   const location = useLocation()
   const isLibrary = location.pathname === '/library'
-  const searchQuery = useFilterStore((s) => s.searchQuery)
-  const setSearchQuery = useFilterStore((s) => s.setSearchQuery)
+  const searchContext = useSearchContext()
+  const openAIKey = useSettingsStore((s) => s.openAIKey)
 
   return (
     <aside className="w-72 shrink-0 border-r border-border bg-card flex flex-col h-full min-h-0 overflow-hidden">
@@ -66,10 +67,17 @@ export function Sidebar() {
       </nav>
       {isLibrary && (
         <>
-          <div className="px-3 py-2.5 border-b border-border">
+          <div className="px-3 py-2.5 border-b border-border space-y-2">
             <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
+              value={searchContext.searchQuery}
+              onChange={searchContext.setSearchQuery}
+              searchMode={searchContext.searchMode}
+              onSearchModeChange={searchContext.setSearchMode}
+              needIndexing={searchContext.needIndexing}
+              isIndexing={searchContext.isIndexing}
+              indexProgress={searchContext.indexProgress}
+              onStartIndexing={() => searchContext.startIndexing(openAIKey ?? '')}
+              hasOpenAIKey={!!openAIKey?.trim()}
             />
           </div>
           <FilterPanel defaultOpen={true} />

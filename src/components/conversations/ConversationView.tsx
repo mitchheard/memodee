@@ -33,9 +33,14 @@ export function ConversationView() {
   const [notionSharing, setNotionSharing] = useState(false)
   const messagesScrollRef = useRef<HTMLDivElement>(null)
 
+  // Scroll to top when a conversation has finished loading (so the messages container is in the DOM)
   useEffect(() => {
-    messagesScrollRef.current?.scrollTo({ top: 0 })
-  }, [activeConversationId])
+    if (convLoading || msgLoading) return
+    const el = messagesScrollRef.current
+    if (!el) return
+    const id = requestAnimationFrame(() => el.scrollTo({ top: 0 }))
+    return () => cancelAnimationFrame(id)
+  }, [activeConversationId, convLoading, msgLoading])
 
   const handleStar = async () => {
     if (!conversation) return

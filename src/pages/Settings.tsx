@@ -4,6 +4,8 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function Settings() {
+  const openAIKey = useSettingsStore((s) => s.openAIKey)
+  const setOpenAIKey = useSettingsStore((s) => s.setOpenAIKey)
   const notionToken = useSettingsStore((s) => s.notionToken)
   const setNotionToken = useSettingsStore((s) => s.setNotionToken)
   const notionDatabaseId = useSettingsStore((s) => s.notionDatabaseId)
@@ -14,9 +16,35 @@ export function Settings() {
       <div>
         <h1 className="text-2xl font-semibold">Settings</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Notion integration and preferences. Data is stored locally in your browser.
+          API keys and preferences. Data is stored locally in your browser.
         </p>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>OpenAI (semantic search)</CardTitle>
+          <CardDescription>
+            Optional. Used to embed conversations for semantic search (Fuzzy | Semantic toggle in Library). Create an API key at{" "}
+            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline text-primary">
+              platform.openai.com
+            </a>
+            .
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="openai-key">API key</Label>
+            <Input
+              id="openai-key"
+              type="password"
+              placeholder="sk-..."
+              value={openAIKey}
+              onChange={(e) => setOpenAIKey(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

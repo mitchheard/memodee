@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { useSearch } from '@/hooks/useSearch'
+import { useSearchContext } from '@/contexts/SearchContext'
 import { useConversationStore } from '@/store/useConversationStore'
 import { useFilterStore } from '@/store/useFilterStore'
 import { deleteConversations } from '@/lib/conversationActions'
@@ -22,7 +22,7 @@ const OVERSCAN = 5
 
 export function ConversationList() {
   const parentRef = useRef<HTMLDivElement>(null)
-  const { conversations, searchResults, isLoading } = useSearch()
+  const { conversations, searchResults, isLoading } = useSearchContext()
   const activeConversationId = useConversationStore((s) => s.activeConversationId)
   const setActiveConversationId = useConversationStore((s) => s.setActiveConversationId)
   const selectedIds = useConversationStore((s) => s.selectedIds)

@@ -6,6 +6,9 @@ export interface FilterStore {
   searchQuery: string
   setSearchQuery: (q: string) => void
 
+  searchMode: 'fuzzy' | 'semantic'
+  setSearchMode: (m: 'fuzzy' | 'semantic') => void
+
   datePreset: DateRangePreset
   setDatePreset: (p: DateRangePreset) => void
 
@@ -26,6 +29,9 @@ export interface FilterStore {
 export const useFilterStore = create<FilterStore>((set) => ({
   searchQuery: '',
   setSearchQuery: (q) => set({ searchQuery: q }),
+
+  searchMode: 'fuzzy',
+  setSearchMode: (m) => set({ searchMode: m }),
 
   datePreset: 'all',
   setDatePreset: (p) => set({ datePreset: p }),

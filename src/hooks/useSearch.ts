@@ -1,6 +1,9 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useConversations } from '@/hooks/useConversations'
 import { useFilterStore } from '@/store/useFilterStore'
+import { useSettingsStore } from '@/store/useSettingsStore'
+import { useEmbeddingIndex } from '@/hooks/useEmbeddingIndex'
+import { useSemanticSearch } from '@/hooks/useSemanticSearch'
 import {
   buildSearchIndex,
   searchConversations,
@@ -59,15 +62,31 @@ export function useSearch(): {
   isLoading: boolean
   searchQuery: string
   setSearchQuery: (q: string) => void
+  searchMode: 'fuzzy' | 'semantic'
+  setSearchMode: (m: 'fuzzy' | 'semantic') => void
+  needIndexing: boolean
+  isIndexing: boolean
+  indexProgress: { current: number; total: number } | null
+  startIndexing: (apiKey: string) => Promise<void>
 } {
   const { conversations: allConversations, isLoading } = useConversations()
   const searchQuery = useFilterStore((s) => s.searchQuery)
   const setSearchQuery = useFilterStore((s) => s.setSearchQuery)
+  const searchMode = useFilterStore((s) => s.searchMode)
+  const setSearchMode = useFilterStore((s) => s.setSearchMode)
+  const openAIKey = useSettingsStore((s) => s.openAIKey)
   const datePreset = useFilterStore((s) => s.datePreset)
   const selectedModels = useFilterStore((s) => s.selectedModels)
   const starredOnly = useFilterStore((s) => s.starredOnly)
   const hasCodeOnly = useFilterStore((s) => s.hasCodeOnly)
   const minMessageCount = useFilterStore((s) => s.minMessageCount)
+
+  const { needIndexing, isIndexing, indexProgress, startIndexing } = useEmbeddingIndex(allConversations)
+  const { conversations: semanticConversations, isLoading: semanticLoading } = useSemanticSearch(
+    searchQuery,
+    searchMode === 'semantic' && !!openAIKey?.trim() && !needIndexing && !isIndexing,
+    openAIKey ?? ''
+  )
 
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery)
 
@@ -95,9 +114,23 @@ export function useSearch(): {
   }, [fuseIndex, debouncedQuery, conversationsById])
 
   const afterSearch = useMemo(() => {
+    if (searchMode === 'semantic' && openAIKey?.trim() && !needIndexing && !isIndexing) {
+      if (!searchQuery.trim()) return allConversations
+      return semanticConversations
+    }
+    // Fuzzy path (or semantic but no key / need indexing)
     if (!debouncedQuery.trim()) return allConversations
     return Array.from(searchResults.values()).map((r) => r.conversation)
-  }, [debouncedQuery, allConversations, searchResults])
+  }, [
+    searchMode,
+    openAIKey,
+    needIndexing,
+    isIndexing,
+    debouncedQuery,
+    allConversations,
+    searchResults,
+    semanticConversations,
+  ])
 
   const conversations = useMemo(() => {
     return applyFilters(afterSearch, {
@@ -119,8 +152,14 @@ export function useSearch(): {
   return {
     conversations,
     searchResults,
-    isLoading,
+    isLoading: isLoading || (searchMode === 'semantic' && semanticLoading),
     searchQuery,
     setSearchQuery,
+    searchMode,
+    setSearchMode,
+    needIndexing,
+    isIndexing,
+    indexProgress,
+    startIndexing,
   }
 }
