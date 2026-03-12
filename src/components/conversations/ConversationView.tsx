@@ -1,7 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { useConversation, useMessages } from '@/hooks/useConversations'
 import { useConversationStore } from '@/store/useConversationStore'
+import { useSettingsStore } from '@/store/useSettingsStore'
 import { deleteConversation, toggleStar } from '@/lib/conversationActions'
+import { shareConversationToNotion } from '@/lib/notion'
 import { MessageBubble } from './MessageBubble'
 import { ExportMenu } from '@/components/actions/ExportMenu'
 import { Button } from '@/components/ui/button'
@@ -15,14 +19,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Star, Trash2 } from 'lucide-react'
+import { Star, Trash2, Share2 } from 'lucide-react'
 
 export function ConversationView() {
+  const navigate = useNavigate()
   const activeConversationId = useConversationStore((s) => s.activeConversationId)
   const setActiveConversationId = useConversationStore((s) => s.setActiveConversationId)
+  const notionToken = useSettingsStore((s) => s.notionToken)
+  const notionDatabaseId = useSettingsStore((s) => s.notionDatabaseId)
   const { conversation, isLoading: convLoading } = useConversation(activeConversationId)
   const { messages, isLoading: msgLoading } = useMessages(activeConversationId)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [notionSharing, setNotionSharing] = useState(false)
 
   const handleStar = async () => {
     if (!conversation) return
@@ -34,6 +42,29 @@ export function ConversationView() {
     await deleteConversation(activeConversationId)
     setActiveConversationId(null)
     setDeleteDialogOpen(false)
+  }
+
+  const handleShareToNotion = async () => {
+    if (!conversation || !notionToken.trim() || !notionDatabaseId.trim()) {
+      toast.error('Set Notion token and Database ID in Settings first.')
+      navigate('/settings')
+      return
+    }
+    setNotionSharing(true)
+    try {
+      const { url } = await shareConversationToNotion(notionToken, notionDatabaseId, conversation, messages)
+      toast.success('Created in Notion', {
+        description: 'Open the page in Notion',
+        action: {
+          label: 'Open in Notion',
+          onClick: () => window.open(url, '_blank'),
+        },
+      })
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Failed to share to Notion')
+    } finally {
+      setNotionSharing(false)
+    }
   }
 
   if (activeConversationId == null) {
@@ -81,6 +112,16 @@ export function ConversationView() {
               <Star className={`size-4 ${conversation.isStarred ? 'fill-current' : ''}`} />
             </Button>
             <ExportMenu conversation={conversation} messages={messages} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleShareToNotion}
+              disabled={notionSharing}
+              aria-label="Share to Notion"
+              title="Share to Notion"
+            >
+              <Share2 className="size-4" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

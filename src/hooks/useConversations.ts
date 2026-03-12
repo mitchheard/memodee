@@ -22,7 +22,15 @@ function toConversation(row: Record<string, unknown>): Conversation {
 
 export function useConversations(): { conversations: Conversation[]; isLoading: boolean } {
   const raw = useLiveQuery(
-    () => db.conversations.orderBy('updatedAt').reverse().toArray(),
+    () =>
+      db.conversations
+        .orderBy('updatedAt')
+        .reverse()
+        .toArray()
+        .catch((err) => {
+          console.error('IndexedDB failed:', err)
+          return []
+        }),
     []
   )
   const conversations = raw ? raw.map((r) => toConversation(r as unknown as Record<string, unknown>)) : []
@@ -31,7 +39,13 @@ export function useConversations(): { conversations: Conversation[]; isLoading: 
 
 export function useConversation(id: string | null): { conversation: Conversation | null; isLoading: boolean } {
   const raw = useLiveQuery(
-    () => (id ? db.conversations.get(id) : Promise.resolve(undefined)),
+    () =>
+      id
+        ? db.conversations.get(id).catch((err) => {
+            console.error('IndexedDB failed:', err)
+            return undefined
+          })
+        : Promise.resolve(undefined),
     [id]
   )
   const conversation = raw ? toConversation(raw as unknown as Record<string, unknown>) : null
@@ -54,7 +68,14 @@ export function useMessages(conversationId: string | null): { messages: Message[
   const raw = useLiveQuery(
     () =>
       conversationId
-        ? db.messages.where('conversationId').equals(conversationId).sortBy('createdAt')
+        ? db.messages
+            .where('conversationId')
+            .equals(conversationId)
+            .sortBy('createdAt')
+            .catch((err) => {
+              console.error('IndexedDB failed:', err)
+              return []
+            })
         : (Promise.resolve([]) as Promise<Message[]>),
     [conversationId]
   )

@@ -7,6 +7,13 @@
     <title>ChatGPT Archive</title>
   </head>
   <body>
+    <script>
+      (function() {
+        var stored = localStorage.getItem('memodee-theme');
+        var dark = stored === 'dark' || (stored !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

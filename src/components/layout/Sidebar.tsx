@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { ConversationList } from '@/components/conversations/ConversationList'
 import { SearchBar } from '@/components/search/SearchBar'
 import { FilterPanel } from '@/components/filters/FilterPanel'
-import { FileArchive, Library } from 'lucide-react'
+import { FileArchive, Library, Settings as SettingsIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useFilterStore } from '@/store/useFilterStore'
 
@@ -38,6 +38,18 @@ export function Sidebar() {
         >
           <Library className="size-4" />
           Library
+        </NavLink>
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+              isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            )
+          }
+        >
+          <SettingsIcon className="size-4" />
+          Settings
         </NavLink>
       </nav>
       {isLibrary && (

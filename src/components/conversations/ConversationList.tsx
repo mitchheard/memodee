@@ -39,6 +39,13 @@ export function ConversationList() {
     return q.length > 0 || date || models || starred || hasCode || minMsg
   })
 
+  const virtualizer = useVirtualizer({
+    count: conversations.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => ROW_HEIGHT_ESTIMATE,
+    overscan: OVERSCAN,
+  })
+
   const handleBulkDeleteConfirm = async () => {
     const ids = Array.from(selectedIds)
     await deleteConversations(ids)
@@ -66,13 +73,6 @@ export function ConversationList() {
       </div>
     )
   }
-
-  const virtualizer = useVirtualizer({
-    count: conversations.length,
-    getScrollElement: () => parentRef.current,
-    estimateSize: () => ROW_HEIGHT_ESTIMATE,
-    overscan: OVERSCAN,
-  })
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
