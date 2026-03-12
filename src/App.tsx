@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
 import { Home } from '@/pages/Home'
 import { Library } from '@/pages/Library'
 import { Settings } from '@/pages/Settings'
@@ -9,6 +10,7 @@ import { Toaster } from '@/components/ui/sonner'
 function App() {
   return (
     <>
+      <KeyboardShortcuts />
       <Routes>
         <Route element={<AppShell />}>
           <Route path="/" element={<Home />} />

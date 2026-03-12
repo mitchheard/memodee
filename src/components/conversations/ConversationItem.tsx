@@ -53,7 +53,7 @@ export function ConversationItem({ conversation, isActive, isSelected, onSelect,
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className={cn(
-        'group w-full text-left px-3 py-2.5 rounded-lg transition-colors flex items-start gap-2 cursor-pointer',
+        'group w-full text-left px-3 py-2.5 rounded-lg transition-colors duration-150 flex items-start gap-2 cursor-pointer',
         'hover:bg-muted/80',
         isActive && 'bg-muted'
       )}
@@ -63,7 +63,7 @@ export function ConversationItem({ conversation, isActive, isSelected, onSelect,
         tabIndex={0}
         onClick={(e) => { e.stopPropagation(); onToggleSelect() }}
         onKeyDown={(e) => e.key === 'Enter' && e.stopPropagation()}
-        className={cn('shrink-0 pt-0.5', !showCheckbox && 'opacity-0 group-hover:opacity-100')}
+        className={cn('shrink-0 pt-0.5 transition-opacity duration-150', !showCheckbox && 'opacity-0 group-hover:opacity-100')}
         aria-label={isSelected ? 'Deselect' : 'Select'}
       >
         <Checkbox checked={isSelected} />

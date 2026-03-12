@@ -15,54 +15,62 @@ export function Sidebar() {
 
   return (
     <aside className="w-72 shrink-0 border-r border-border bg-card flex flex-col h-full min-h-0 overflow-hidden">
-      <nav className="px-3 py-2.5 border-b border-border flex gap-1">
+      <nav className="p-2 border-b border-border grid grid-cols-2 gap-1">
         <NavLink
           to="/"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-              isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )
           }
         >
-          <FileArchive className="size-4" />
-          Import
+          <FileArchive className="size-4 shrink-0" />
+          <span className="truncate">Import</span>
         </NavLink>
         <NavLink
           to="/library"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-              isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )
           }
         >
-          <Library className="size-4" />
-          Library
+          <Library className="size-4 shrink-0" />
+          <span className="truncate">Library</span>
         </NavLink>
         <NavLink
           to="/analytics"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-              isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )
           }
         >
-          <BarChart3 className="size-4" />
-          Analytics
+          <BarChart3 className="size-4 shrink-0" />
+          <span className="truncate">Analytics</span>
         </NavLink>
         <NavLink
           to="/settings"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-              isActive ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              'flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
             )
           }
         >
-          <SettingsIcon className="size-4" />
-          Settings
+          <SettingsIcon className="size-4 shrink-0" />
+          <span className="truncate">Settings</span>
         </NavLink>
       </nav>
       {isLibrary && (

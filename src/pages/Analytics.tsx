@@ -12,6 +12,9 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts'
+import { BarChart3 } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
 
 const MODEL_COLORS = ['#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#fb923c', '#eab308']
 
@@ -67,17 +70,28 @@ export function Analytics() {
 
   if (isLoading) {
     return (
-      <div className="p-8 flex items-center justify-center text-muted-foreground">
-        Loading analytics…
+      <div className="p-8 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+        <BarChart3 className="size-10 animate-pulse" />
+        <p className="text-sm">Loading analytics…</p>
       </div>
     )
   }
 
   if (!data || (data.totalConversations === 0 && data.totalMessages === 0)) {
     return (
-      <div className="p-8 flex flex-col items-center justify-center text-muted-foreground gap-2">
-        <p>No data yet.</p>
-        <p className="text-sm">Import a ChatGPT export to see analytics.</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-5 text-center p-8 animate-in fade-in duration-200">
+        <div className="rounded-full bg-muted p-4">
+          <BarChart3 className="size-10 text-muted-foreground" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-medium text-foreground">No data yet</p>
+          <p className="text-sm text-muted-foreground max-w-sm">
+            Import a ChatGPT export to see conversation and usage analytics.
+          </p>
+        </div>
+        <Link to="/">
+          <Button>Go to Import</Button>
+        </Link>
       </div>
     )
   }

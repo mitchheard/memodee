@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { AlertTriangle } from 'lucide-react'
 
 interface Props {
   children: ReactNode
@@ -23,18 +24,31 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-6">
-          <div className="max-w-md space-y-4 text-center">
-            <h1 className="text-xl font-semibold text-destructive">Something went wrong</h1>
-            <p className="text-sm text-muted-foreground font-mono break-words">
-              {this.state.error.message}
-            </p>
-            <Button
-              onClick={() => this.setState({ error: null })}
-              variant="outline"
-            >
-              Try again
-            </Button>
+        <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center p-8">
+          <div className="max-w-md flex flex-col items-center gap-5 text-center">
+            <div className="rounded-full bg-destructive/10 p-4">
+              <AlertTriangle className="size-10 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-xl font-semibold text-foreground">Something went wrong</h1>
+              <p className="text-sm text-muted-foreground font-mono break-words bg-muted/50 rounded-lg px-3 py-2">
+                {this.state.error.message}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button
+                onClick={() => this.setState({ error: null })}
+                variant="outline"
+              >
+                Try again
+              </Button>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="default"
+              >
+                Reload app
+              </Button>
+            </div>
           </div>
         </div>
       )

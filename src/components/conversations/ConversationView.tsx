@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Star, Trash2, Share2 } from 'lucide-react'
+import { Star, Trash2, Share2, MessageSquare, AlertCircle, Loader2 } from 'lucide-react'
 
 export function ConversationView() {
   const navigate = useNavigate()
@@ -79,24 +79,37 @@ export function ConversationView() {
 
   if (activeConversationId == null) {
     return (
-      <div className="flex-1 flex items-center justify-center text-muted-foreground">
-        <p>Select a conversation</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8 animate-in fade-in duration-200">
+        <div className="rounded-full bg-muted p-3">
+          <MessageSquare className="size-8 text-muted-foreground" />
+        </div>
+        <p className="text-sm font-medium text-foreground">Select a conversation</p>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          Choose one from the list to read and export.
+        </p>
       </div>
     )
   }
 
   if (convLoading || msgLoading) {
     return (
-      <div className="flex-1 flex items-center justify-center text-muted-foreground">
-        <p>Loading…</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 text-muted-foreground animate-in fade-in duration-150">
+        <Loader2 className="size-8 animate-spin" />
+        <p className="text-sm">Loading…</p>
       </div>
     )
   }
 
   if (!conversation) {
     return (
-      <div className="flex-1 flex items-center justify-center text-muted-foreground">
-        <p>Conversation not found</p>
+      <div className="flex-1 flex flex-col items-center justify-center gap-3 text-center p-8 animate-in fade-in duration-200">
+        <div className="rounded-full bg-destructive/10 p-3">
+          <AlertCircle className="size-8 text-destructive" />
+        </div>
+        <p className="text-sm font-medium text-foreground">Conversation not found</p>
+        <p className="text-sm text-muted-foreground max-w-xs">
+          It may have been deleted or the link is invalid.
+        </p>
       </div>
     )
   }

@@ -17,6 +17,11 @@ function applyTheme(theme: Theme) {
   localStorage.setItem(STORAGE_KEY, theme)
 }
 
+// Apply stored theme on load so flash of wrong theme is avoided
+if (typeof document !== 'undefined') {
+  applyTheme(getStoredTheme())
+}
+
 export interface ThemeStore {
   theme: Theme
   setTheme: (theme: Theme) => void
