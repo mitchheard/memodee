@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Star, Trash2, Share2, MessageSquare, AlertCircle, Loader2 } from 'lucide-react'
+import { Star, Trash2, Share2, MessageSquare, AlertCircle, Loader2, ChevronDown } from 'lucide-react'
 
 export function ConversationView() {
   const navigate = useNavigate()
@@ -31,6 +31,7 @@ export function ConversationView() {
   const { messages, isLoading: msgLoading } = useMessages(activeConversationId)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [notionSharing, setNotionSharing] = useState(false)
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false)
   const messagesScrollRef = useRef<HTMLDivElement>(null)
 
   // Scroll to top when a conversation has finished loading (so the messages container is in the DOM)
@@ -41,6 +42,24 @@ export function ConversationView() {
     const id = requestAnimationFrame(() => el.scrollTo({ top: 0 }))
     return () => cancelAnimationFrame(id)
   }, [activeConversationId, convLoading, msgLoading])
+
+  // Show/hide scroll-to-bottom button based on scroll position
+  useEffect(() => {
+    const el = messagesScrollRef.current
+    if (!el || messages.length === 0) return
+    const threshold = 80
+    const check = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el
+      setShowScrollToBottom(scrollHeight - scrollTop - clientHeight > threshold)
+    }
+    check()
+    el.addEventListener('scroll', check, { passive: true })
+    return () => el.removeEventListener('scroll', check)
+  }, [messages.length])
+
+  const scrollToBottom = () => {
+    messagesScrollRef.current?.scrollTo({ top: messagesScrollRef.current.scrollHeight, behavior: 'smooth' })
+  }
 
   const handleStar = async () => {
     if (!conversation) return
@@ -157,13 +176,27 @@ export function ConversationView() {
           </div>
         </div>
       </header>
-      <div
-        ref={messagesScrollRef}
-        className="flex-1 overflow-auto p-4 space-y-4"
-      >
-        {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} />
-        ))}
+      <div className="flex-1 min-h-0 relative">
+        <div
+          ref={messagesScrollRef}
+          className="absolute inset-0 overflow-auto p-4 space-y-4"
+        >
+          {messages.map((msg) => (
+            <MessageBubble key={msg.id} message={msg} />
+          ))}
+        </div>
+        {showScrollToBottom && (
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={scrollToBottom}
+            className="absolute bottom-4 right-4 h-10 w-10 rounded-full shadow-lg border bg-background/95 backdrop-blur hover:bg-background"
+            aria-label="Scroll to bottom"
+            title="Scroll to bottom"
+          >
+            <ChevronDown className="size-5" />
+          </Button>
+        )}
       </div>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
