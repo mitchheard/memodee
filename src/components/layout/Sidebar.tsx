@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import { ConversationList } from '@/components/conversations/ConversationList'
 import { SearchBar } from '@/components/search/SearchBar'
 import { FilterPanel } from '@/components/filters/FilterPanel'
@@ -73,7 +73,7 @@ export function Sidebar() {
           <span className="truncate">Settings</span>
         </NavLink>
       </nav>
-      {isLibrary && (
+      {isLibrary ? (
         <>
           <div className="px-3 py-2.5 border-b border-border space-y-2">
             <SearchBar
@@ -89,11 +89,15 @@ export function Sidebar() {
             />
           </div>
           <FilterPanel defaultOpen={true} />
+          <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+            <ConversationList />
+          </div>
         </>
+      ) : (
+        <div className="flex-1 p-3 text-sm text-muted-foreground">
+          <p>Go to <Link to="/library" className="font-medium text-foreground hover:underline">Library</Link> to browse and search your conversations.</p>
+        </div>
       )}
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <ConversationList />
-      </div>
     </aside>
   )
 }
