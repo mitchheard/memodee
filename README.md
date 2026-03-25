@@ -27,3 +27,28 @@ You should see a progress bar and then "X conversations imported".
 npm run build
 npm run preview
 ```
+
+## Deploy to Render (Web Service)
+
+This repository is configured to run as a Render Web Service with:
+
+- a Node server entrypoint in `server.mjs`
+- static frontend hosting from `dist`
+- API route support at `/api/notion-proxy`
+
+### Option A: Blueprint (recommended)
+
+1. Push this repo to GitHub/GitLab.
+2. In Render, choose **New +** -> **Blueprint**.
+3. Select this repository and apply `render.yaml`.
+
+### Option B: Manual Web Service
+
+Use these Render settings:
+
+- **Environment:** Node
+- **Build Command:** `npm ci && npm run build`
+- **Start Command:** `npm start`
+- **Health Check Path:** `/healthz`
+
+After deploy, your SPA is served by the same service and client calls to `/api/notion-proxy` stay on the same domain.
