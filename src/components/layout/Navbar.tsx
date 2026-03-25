@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 const PAGE_TITLES: Record<string, string> = {
   '/': 'ChatGPT Archive',
   '/library': 'Library',
+  '/analytics': 'Analytics',
   '/settings': 'Settings',
 }
 
