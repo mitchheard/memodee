@@ -45,8 +45,12 @@ export function ConversationView() {
 
   // Show/hide scroll-to-bottom button based on scroll position
   useEffect(() => {
+    if (messages.length === 0) {
+      setShowScrollToBottom(false)
+      return
+    }
     const el = messagesScrollRef.current
-    if (!el || messages.length === 0) return
+    if (!el) return
     const threshold = 80
     const check = () => {
       const { scrollTop, scrollHeight, clientHeight } = el
@@ -55,7 +59,7 @@ export function ConversationView() {
     check()
     el.addEventListener('scroll', check, { passive: true })
     return () => el.removeEventListener('scroll', check)
-  }, [messages.length])
+  }, [activeConversationId, messages.length])
 
   const scrollToBottom = () => {
     messagesScrollRef.current?.scrollTo({ top: messagesScrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -136,7 +140,7 @@ export function ConversationView() {
   return (
     <div className="flex flex-col h-full min-w-0 flex-1">
       <header className="shrink-0 border-b border-border px-4 py-3">
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center justify-between gap-2">
           <div className="min-w-0 flex-1">
             <h1 className="font-semibold text-lg truncate">{conversation.title || 'Untitled'}</h1>
             <p className="text-sm text-muted-foreground">
@@ -190,7 +194,7 @@ export function ConversationView() {
             variant="secondary"
             size="icon"
             onClick={scrollToBottom}
-            className="absolute bottom-4 right-4 h-10 w-10 rounded-full shadow-lg border bg-background/95 backdrop-blur hover:bg-background"
+            className="absolute bottom-4 right-4 z-10 h-10 w-10 rounded-full border bg-background/95 shadow-lg backdrop-blur hover:bg-background"
             aria-label="Scroll to bottom"
             title="Scroll to bottom"
           >

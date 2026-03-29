@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useImport } from '@/hooks/useImport'
 import { DropZone } from '@/components/import/DropZone'
 import { ImportProgress } from '@/components/import/ImportProgress'
+import { ImportSuccessStats } from '@/components/import/ImportSuccessStats'
 import { Button } from '@/components/ui/button'
 
 export function Home() {
@@ -27,11 +28,12 @@ export function Home() {
       </div>
 
       {progress.stage === 'done' ? (
-        <div className="flex flex-col items-center gap-4 w-full max-w-md">
-          <p className="text-lg text-primary font-medium">{progress.message}</p>
-          <div className="flex gap-2">
+        <div className="flex flex-col items-center gap-6 w-full max-w-3xl">
+          <p className="text-lg text-primary font-medium text-center">{progress.message}</p>
+          <ImportSuccessStats className="animate-in fade-in slide-in-from-bottom-2 duration-300" />
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <Link to="/library">
-              <Button>Go to Library</Button>
+              <Button size="lg">Go to Library</Button>
             </Link>
             <Button type="button" variant="ghost" onClick={reset}>
               Import another file

@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types'
+import { MessageMarkdown } from './MessageMarkdown'
 
 interface MessageBubbleProps {
   message: Message
@@ -24,7 +25,11 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-background/20">{message.model}</span>
         )}
       </div>
-      <div className="whitespace-pre-wrap break-words text-sm">{message.content}</div>
+      {isAssistant ? (
+        <MessageMarkdown content={message.content} />
+      ) : (
+        <div className="whitespace-pre-wrap break-words text-sm">{message.content}</div>
+      )}
     </div>
   )
 }

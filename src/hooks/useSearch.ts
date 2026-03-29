@@ -10,6 +10,7 @@ import {
   type SearchResult,
 } from '@/lib/search'
 import type { Conversation } from '@/types'
+import { matchesModelFilter } from '@/lib/modelFilter'
 
 const DEBOUNCE_MS = 150
 
@@ -38,7 +39,7 @@ function applyFilters(
   }
 
   if (filters.selectedModels.size > 0) {
-    list = list.filter((c) => filters.selectedModels.has(c.model))
+    list = list.filter((c) => matchesModelFilter(c.model, filters.selectedModels))
   }
 
   if (filters.starredOnly) {

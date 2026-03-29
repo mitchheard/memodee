@@ -1,7 +1,6 @@
 import { useSettingsStore } from '@/store/useSettingsStore'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { SettingTextField } from '@/components/settings/SettingTextField'
 
 export function Settings() {
   const openAIKey = useSettingsStore((s) => s.openAIKey)
@@ -16,7 +15,8 @@ export function Settings() {
       <div>
         <h1 className="text-2xl font-semibold">Settings</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          API keys and preferences. Data is stored locally in your browser.
+          Connect OpenAI and Notion for search and sharing. Nothing leaves your browser—credentials are stored only on
+          this device.
         </p>
       </div>
 
@@ -24,25 +24,29 @@ export function Settings() {
         <CardHeader>
           <CardTitle>OpenAI (semantic search)</CardTitle>
           <CardDescription>
-            Optional. Used to embed conversations for semantic search (Fuzzy | Semantic toggle in Library). Create an API key at{" "}
-            <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="underline text-primary">
+            Optional. Used to embed chats so semantic search can match by meaning (use the Fuzzy | Semantic control in the
+            Library). Create a key at{' '}
+            <a
+              href="https://platform.openai.com/api-keys"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-primary"
+            >
               platform.openai.com
             </a>
             .
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="openai-key">API key</Label>
-            <Input
-              id="openai-key"
-              type="password"
-              placeholder="sk-..."
-              value={openAIKey}
-              onChange={(e) => setOpenAIKey(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+          <SettingTextField
+            id="openai-key"
+            label="OpenAI API Key"
+            value={openAIKey}
+            onChange={setOpenAIKey}
+            placeholder="sk-..."
+            inputType="password"
+            maskWhenSaved
+          />
         </CardContent>
       </Card>
 
@@ -50,7 +54,7 @@ export function Settings() {
         <CardHeader>
           <CardTitle>Notion</CardTitle>
           <CardDescription>
-            Share conversations to a Notion database. Create an{" "}
+            Send a conversation to a Notion database. Create an{' '}
             <a
               href="https://www.notion.so/my-integrations"
               target="_blank"
@@ -59,35 +63,34 @@ export function Settings() {
             >
               internal integration
             </a>
-            , copy the token, and add the database to your integration. Then paste the database ID (from the database URL).
+            , copy the token, and give that integration access to your database. Then paste the database ID from the
+            database URL below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="notion-token">Integration token (secret)</Label>
-            <Input
-              id="notion-token"
-              type="password"
-              placeholder="secret_..."
-              value={notionToken}
-              onChange={(e) => setNotionToken(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="notion-database-id">Database ID</Label>
-            <Input
-              id="notion-database-id"
-              type="text"
-              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              value={notionDatabaseId}
-              onChange={(e) => setNotionDatabaseId(e.target.value)}
-              autoComplete="off"
-            />
-            <p className="text-xs text-muted-foreground">
-              From the database URL: notion.so/workspace/<strong>database-id</strong>?v=...
-            </p>
-          </div>
+          <SettingTextField
+            id="notion-token"
+            label="Notion API Token"
+            value={notionToken}
+            onChange={setNotionToken}
+            placeholder="secret_..."
+            inputType="password"
+            maskWhenSaved
+          />
+          <SettingTextField
+            id="notion-database-id"
+            label="Database ID"
+            value={notionDatabaseId}
+            onChange={setNotionDatabaseId}
+            placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+            inputType="text"
+            hint={
+              <p className="text-xs text-muted-foreground">
+                From the database URL: notion.so/workspace/<strong>database-id</strong>?v=... Use the ID from the link,
+                not the page title.
+              </p>
+            }
+          />
         </CardContent>
       </Card>
     </div>

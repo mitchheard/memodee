@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+---
+
+# Memodee — Project Rules
+
+## Linear workflow
+When implementing a Linear issue:
+1. Read the issue via the Linear MCP before writing any code
+2. Search the codebase to locate exact files before making changes
+3. Run tests and build before finishing (npm run test && npm run build)
+4. Flag pre-existing issues you encountered but did not change — don't fix them
+5. Show me the result or before/after so I can verify visually before closing
+
+## Project context
+- Product name: Memodee (marketed as "ChatGPT Archive")
+- Client-side app — core features run entirely in the browser via IndexedDB (Dexie)
+- No backend except a lightweight Express server for the Notion proxy (/api/notion-proxy)
+- Framework: Vite + React + TypeScript (not Next.js)
+- Key libs: Zustand (state), Dexie (IndexedDB), Fuse.js (fuzzy search), Recharts (charts), Sonner (toasts), React Router, TanStack Virtual
+
+## Key entry points
+- src/main.tsx, src/App.tsx
+- src/components/layout/AppShell.tsx
+- src/pages/* (Import, Library, Analytics, Settings)
+- src/store/* (Zustand stores)
+- src/lib/* (db.ts, parser.ts, etc.)
+
+## Constraints
+- Never add a backend feature that could be done client-side
+- Never persist user data to a server — everything stays in IndexedDB
+- Don't touch the Notion proxy unless the task explicitly involves it

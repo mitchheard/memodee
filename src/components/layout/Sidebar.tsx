@@ -1,4 +1,4 @@
-import { NavLink, Link, useLocation } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import { ConversationList } from '@/components/conversations/ConversationList'
 import { SearchBar } from '@/components/search/SearchBar'
 import { FilterPanel } from '@/components/filters/FilterPanel'
@@ -53,15 +53,13 @@ export function Sidebar() {
                 hasOpenAIKey={!!openAIKey?.trim()}
               />
             </div>
-            <FilterPanel defaultOpen={true} />
+            <FilterPanel />
             <div className="flex-1 overflow-hidden flex flex-col min-h-0">
               <ConversationList />
             </div>
           </>
         ) : (
-          <div className="flex-1 p-3 text-sm text-muted-foreground">
-            <p>Go to <Link to="/library" className="font-medium text-foreground hover:underline">Library</Link> to browse and search your conversations.</p>
-          </div>
+          <div className="flex-1 min-h-0" />
         )}
       </div>
       <nav className="p-2 border-t border-sidebar-border">

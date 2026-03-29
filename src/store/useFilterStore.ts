@@ -12,8 +12,9 @@ export interface FilterStore {
   datePreset: DateRangePreset
   setDatePreset: (p: DateRangePreset) => void
 
+  /** Display labels (see `modelDisplayLabel`), not raw model IDs */
   selectedModels: Set<string>
-  toggleModel: (model: string) => void
+  toggleModel: (modelLabel: string) => void
   clearModels: () => void
 
   starredOnly: boolean
@@ -24,6 +25,10 @@ export interface FilterStore {
 
   minMessageCount: number
   setMinMessageCount: (n: number) => void
+
+  /** Library filter panel body expanded (session-only; default collapsed). */
+  filtersPanelExpanded: boolean
+  setFiltersPanelExpanded: (open: boolean) => void
 }
 
 export const useFilterStore = create<FilterStore>((set) => ({
@@ -54,4 +59,7 @@ export const useFilterStore = create<FilterStore>((set) => ({
 
   minMessageCount: 0,
   setMinMessageCount: (n) => set({ minMessageCount: Math.max(0, n) }),
+
+  filtersPanelExpanded: false,
+  setFiltersPanelExpanded: (open) => set({ filtersPanelExpanded: open }),
 }))

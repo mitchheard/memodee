@@ -1,11 +1,20 @@
+import { useEffect } from 'react'
 import { ConversationView } from '@/components/conversations/ConversationView'
 import { useConversations } from '@/hooks/useConversations'
-import { Link } from 'react-router-dom'
+import { useConversationStore } from '@/store/useConversationStore'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Inbox } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export function Library() {
   const { conversations, isLoading } = useConversations()
+  const [searchParams] = useSearchParams()
+  const setActiveConversationId = useConversationStore((s) => s.setActiveConversationId)
+
+  useEffect(() => {
+    const id = searchParams.get('c')
+    if (id) setActiveConversationId(id)
+  }, [searchParams, setActiveConversationId])
 
   if (!isLoading && conversations.length === 0) {
     return (
@@ -27,7 +36,7 @@ export function Library() {
   }
 
   return (
-    <div className="flex-1 flex min-h-0 min-w-0 overflow-hidden">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <ConversationView />
     </div>
   )

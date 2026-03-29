@@ -7,6 +7,8 @@ export interface AnalyticsData {
   totalMessages: number
   estimatedTokens: number
   firstConversationDate: Date | null
+  /** Newest conversation by `createdAt` (same source as firstConversationDate). */
+  lastConversationDate: Date | null
   messagesPerDay: Array<{ date: string; count: number }>
   messagesPerMonth: Array<{ month: string; count: number }>
   modelCounts: Array<{ name: string; value: number }>
@@ -35,13 +37,17 @@ export function useAnalytics(): { data: AnalyticsData | null; isLoading: boolean
     const estimatedTokens = msgs.reduce((sum, m) => sum + Math.floor((m.content?.length ?? 0) / 4), 0)
 
     let firstConversationDate: Date | null = null
+    let lastConversationDate: Date | null = null
     if (convos.length > 0) {
       let minTs = Infinity
+      let maxTs = -Infinity
       for (const c of convos) {
         const t = c.createdAt instanceof Date ? c.createdAt.getTime() : new Date(c.createdAt as number | string).getTime()
         if (t < minTs) minTs = t
+        if (t > maxTs) maxTs = t
       }
       firstConversationDate = Number.isFinite(minTs) ? new Date(minTs) : null
+      lastConversationDate = Number.isFinite(maxTs) ? new Date(maxTs) : null
     }
 
     const dayCounts = new Map<string, number>()
@@ -69,18 +75,25 @@ export function useAnalytics(): { data: AnalyticsData | null; isLoading: boolean
       const name = c.model || 'unknown'
       modelCountsMap.set(name, (modelCountsMap.get(name) ?? 0) + 1)
     }
-    const modelCounts = Array.from(modelCountsMap.entries()).map(([name, value]) => ({ name, value }))
+    const modelCounts = Array.from(modelCountsMap.entries())
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value || a.name.localeCompare(b.name))
 
     const topConversationsByLength = [...convos]
       .sort((a, b) => (b.messageCount ?? 0) - (a.messageCount ?? 0))
       .slice(0, 10)
-      .map((c) => ({ id: c.id, title: (c.title || 'Untitled').slice(0, 40), count: c.messageCount ?? 0 }))
+      .map((c) => ({
+        id: c.id,
+        title: (c.title || 'Untitled').trim() || 'Untitled',
+        count: c.messageCount ?? 0,
+      }))
 
     return {
       totalConversations,
       totalMessages,
       estimatedTokens,
       firstConversationDate,
+      lastConversationDate,
       messagesPerDay,
       messagesPerMonth,
       modelCounts,
