@@ -1,6 +1,8 @@
 import type { Conversation, Message } from '@/types'
 import { conversationToMarkdown, downloadMarkdown } from '@/lib/exportMarkdown'
 import { conversationToObsidian, downloadObsidian } from '@/lib/exportObsidian'
+import { printConversationAsPdf } from '@/lib/exportPrintPdf'
+import { toast } from 'sonner'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +33,13 @@ export function ExportMenu({ conversation, messages, disabled }: ExportMenuProps
     downloadObsidian(content, `${safeFilename(conversation.title)}.md`)
   }
 
+  const handlePdf = () => {
+    const ok = printConversationAsPdf(conversation, messages)
+    if (!ok) {
+      toast.error('Could not open print window. Allow pop-ups for this site, then try again.')
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger disabled={disabled}>
@@ -42,6 +51,7 @@ export function ExportMenu({ conversation, messages, disabled }: ExportMenuProps
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleMarkdown}>Export as Markdown</DropdownMenuItem>
         <DropdownMenuItem onClick={handleObsidian}>Export as Obsidian</DropdownMenuItem>
+        <DropdownMenuItem onClick={handlePdf}>Export as PDF</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
