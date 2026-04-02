@@ -197,11 +197,18 @@ export function buildConversationPrintHtml(conversation: Conversation, messages:
 /** Opens a print dialog; user can choose "Save as PDF" as the destination. */
 export function printConversationAsPdf(conversation: Conversation, messages: Message[]): boolean {
   const html = buildConversationPrintHtml(conversation, messages)
-  const w = window.open('', '_blank', 'noopener,noreferrer')
-  if (!w) return false
-  w.document.open()
-  w.document.write(html)
-  w.document.close()
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' })
+  const blobUrl = URL.createObjectURL(blob)
+
+  // Do not pass noopener/noreferrer: with those flags, Chromium and WebKit often open
+  // about:blank but return null (or an unusable handle) to the opener, so we never write
+  // HTML and the tab stays blank. A blob: URL loads real content without document.write.
+  const w = window.open(blobUrl, '_blank')
+  if (!w) {
+    URL.revokeObjectURL(blobUrl)
+    return false
+  }
+
   let printed = false
   const runPrint = () => {
     if (printed) return
@@ -209,10 +216,14 @@ export function printConversationAsPdf(conversation: Conversation, messages: Mes
     w.focus()
     w.print()
   }
-  w.onload = runPrint
-  setTimeout(runPrint, 250)
+
+  w.addEventListener('load', runPrint)
+  setTimeout(runPrint, 400)
+
   w.addEventListener('afterprint', () => {
+    URL.revokeObjectURL(blobUrl)
     w.close()
   })
+
   return true
 }
