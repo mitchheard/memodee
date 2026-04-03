@@ -315,7 +315,7 @@ export function Analytics() {
         <div className="space-y-1">
           <p className="font-medium text-foreground">No data yet</p>
           <p className="text-sm text-muted-foreground max-w-sm">
-            Import a ChatGPT export to see conversation and usage analytics.
+            Import your conversation history to see analytics.
           </p>
         </div>
         <Link to="/">
