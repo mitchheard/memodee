@@ -11,6 +11,7 @@ import {
 } from '@/lib/search'
 import type { Conversation } from '@/types'
 import { matchesModelFilter } from '@/lib/modelFilter'
+import { trackSearchPerformed } from '@/lib/analytics'
 
 const DEBOUNCE_MS = 150
 
@@ -95,6 +96,11 @@ export function useSearch(): {
     const t = setTimeout(() => setDebouncedQuery(searchQuery), DEBOUNCE_MS)
     return () => clearTimeout(t)
   }, [searchQuery])
+
+  useEffect(() => {
+    if (!debouncedQuery.trim()) return
+    trackSearchPerformed(searchMode)
+  }, [debouncedQuery, searchMode])
 
   const fuseIndex = useMemo(
     () => buildSearchIndex(allConversations),

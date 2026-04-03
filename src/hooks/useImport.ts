@@ -3,6 +3,7 @@ import JSZip from 'jszip'
 import { parseExport } from '@/lib/parser'
 import type { ChatGPTExportConversation } from '@/types'
 import { db } from '@/lib/db'
+import { trackImportCompleted } from '@/lib/analytics'
 
 const CONVERSATION_BATCH = 100
 const MESSAGE_BATCH = 500
@@ -157,6 +158,7 @@ export function useImport() {
         processedMessages: messages.length,
         message: `${conversations.length.toLocaleString()} conversations imported`,
       })
+      trackImportCompleted(conversations.length)
       return { count: conversations.length }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Import failed'

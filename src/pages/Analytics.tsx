@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -24,6 +24,7 @@ import {
   getHeatmapLegendSwatches,
   truncateChartLabel,
 } from '@/lib/analyticsCharts'
+import { trackAnalyticsViewed } from '@/lib/analytics'
 
 const MODEL_COLORS = ['#4ade80', '#60a5fa', '#a78bfa', '#f472b6', '#fb923c', '#eab308']
 
@@ -266,6 +267,25 @@ function ActivityHeatmap({ data }: { data: Array<{ date: string; count: number }
 
 export function Analytics() {
   const { data, isLoading } = useAnalytics()
+  const navigate = useNavigate()
+  const analyticsViewedSent = useRef(false)
+
+  const handleLongestBarClick = useCallback(
+    (rect: { payload?: unknown }) => {
+      const row = rect.payload as LongestBarRow | undefined
+      const id = row?.id
+      if (id) navigate(`/library?c=${encodeURIComponent(id)}`)
+    },
+    [navigate]
+  )
+
+  useEffect(() => {
+    if (isLoading || !data) return
+    if (data.totalConversations === 0 && data.totalMessages === 0) return
+    if (analyticsViewedSent.current) return
+    analyticsViewedSent.current = true
+    trackAnalyticsViewed()
+  }, [isLoading, data])
 
   const modelTotal = useMemo(() => {
     if (!data?.modelCounts.length) return 0
@@ -468,7 +488,14 @@ export function Analytics() {
                   )}
                 />
                 <Tooltip content={<ConversationLengthTooltip />} cursor={{ fill: 'var(--muted)', fillOpacity: 0.35 }} />
-                <Bar dataKey="count" name="Messages" fill="var(--primary)" radius={[0, 4, 4, 0]} />
+                <Bar
+                  dataKey="count"
+                  name="Messages"
+                  fill="var(--primary)"
+                  radius={[0, 4, 4, 0]}
+                  className="cursor-pointer"
+                  onClick={handleLongestBarClick}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

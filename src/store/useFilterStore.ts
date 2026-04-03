@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { trackFilterApplied } from '@/lib/analytics'
 
 export type DateRangePreset = 'all' | '30d' | '6m' | 'year'
 
@@ -39,26 +40,43 @@ export const useFilterStore = create<FilterStore>((set) => ({
   setSearchMode: (m) => set({ searchMode: m }),
 
   datePreset: 'all',
-  setDatePreset: (p) => set({ datePreset: p }),
+  setDatePreset: (p) => {
+    set({ datePreset: p })
+    trackFilterApplied('date')
+  },
 
   selectedModels: new Set(),
-  toggleModel: (model) =>
+  toggleModel: (model) => {
     set((s) => {
       const next = new Set(s.selectedModels)
       if (next.has(model)) next.delete(model)
       else next.add(model)
       return { selectedModels: next }
-    }),
-  clearModels: () => set({ selectedModels: new Set() }),
+    })
+    trackFilterApplied('model')
+  },
+  clearModels: () => {
+    set({ selectedModels: new Set() })
+    trackFilterApplied('model')
+  },
 
   starredOnly: false,
-  setStarredOnly: (v) => set({ starredOnly: v }),
+  setStarredOnly: (v) => {
+    set({ starredOnly: v })
+    trackFilterApplied('starred')
+  },
 
   hasCodeOnly: false,
-  setHasCodeOnly: (v) => set({ hasCodeOnly: v }),
+  setHasCodeOnly: (v) => {
+    set({ hasCodeOnly: v })
+    trackFilterApplied('has_code')
+  },
 
   minMessageCount: 0,
-  setMinMessageCount: (n) => set({ minMessageCount: Math.max(0, n) }),
+  setMinMessageCount: (n) => {
+    set({ minMessageCount: Math.max(0, n) })
+    trackFilterApplied('min_messages')
+  },
 
   filtersPanelExpanded: false,
   setFiltersPanelExpanded: (open) => set({ filtersPanelExpanded: open }),

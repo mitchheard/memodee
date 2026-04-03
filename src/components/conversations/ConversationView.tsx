@@ -6,6 +6,7 @@ import { useConversationStore } from '@/store/useConversationStore'
 import { useSettingsStore } from '@/store/useSettingsStore'
 import { deleteConversation, toggleStar } from '@/lib/conversationActions'
 import { shareConversationToNotion } from '@/lib/notion'
+import { trackExportTriggered } from '@/lib/analytics'
 import { MessageBubble } from './MessageBubble'
 import { ExportMenu } from '@/components/actions/ExportMenu'
 import { Button } from '@/components/ui/button'
@@ -86,6 +87,7 @@ export function ConversationView() {
     setNotionSharing(true)
     try {
       const { url } = await shareConversationToNotion(notionToken, notionDatabaseId, conversation, messages)
+      trackExportTriggered('notion')
       toast.success('Created in Notion', {
         description: 'Open the page in Notion',
         action: {

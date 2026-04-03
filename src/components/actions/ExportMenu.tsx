@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
 import { FileDown } from 'lucide-react'
+import { trackExportTriggered } from '@/lib/analytics'
 
 interface ExportMenuProps {
   conversation: Conversation
@@ -24,11 +25,13 @@ function safeFilename(title: string): string {
 
 export function ExportMenu({ conversation, messages, disabled }: ExportMenuProps) {
   const handleMarkdown = () => {
+    trackExportTriggered('markdown')
     const md = conversationToMarkdown(conversation, messages)
     downloadMarkdown(md, `${safeFilename(conversation.title)}.md`)
   }
 
   const handleObsidian = () => {
+    trackExportTriggered('obsidian')
     const content = conversationToObsidian(conversation, messages)
     downloadObsidian(content, `${safeFilename(conversation.title)}.md`)
   }

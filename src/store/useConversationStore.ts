@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { trackConversationOpened } from '@/lib/analytics'
 
 interface ConversationStore {
   activeConversationId: string | null
@@ -10,7 +11,13 @@ interface ConversationStore {
 
 export const useConversationStore = create<ConversationStore>((set) => ({
   activeConversationId: null,
-  setActiveConversationId: (id) => set({ activeConversationId: id }),
+  setActiveConversationId: (id) =>
+    set((state) => {
+      if (id != null && id !== state.activeConversationId) {
+        trackConversationOpened()
+      }
+      return { activeConversationId: id }
+    }),
   selectedIds: new Set(),
   toggleSelection: (id) =>
     set((state) => {
