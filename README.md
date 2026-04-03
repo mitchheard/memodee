@@ -52,3 +52,9 @@ Use these Render settings:
 - **Health Check Path:** `/healthz`
 
 After deploy, your SPA is served by the same service and client calls to `/api/notion-proxy` stay on the same domain.
+
+### Production URL
+
+The live app uses the custom domain **[https://memodee.app](https://memodee.app)**. Add that hostname under the service **Settings → Custom Domains** in Render and point DNS at Render’s target (see your registrar’s docs for apex vs `www`). The default `*.onrender.com` URL remains available as a fallback.
+
+Production builds read `VITE_SITE_URL` from `.env.production` so the HTML includes a canonical URL for the primary domain.

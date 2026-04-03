@@ -2,7 +2,33 @@ import { useCallback, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { FileArchive } from 'lucide-react'
+
+function DropZoneUploadIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 15 15"
+      fill="none"
+      className={className}
+      aria-hidden
+    >
+      <path
+        d="M7.5 2v7M7.5 2L5 4.5M7.5 2L10 4.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M2 10v2.5a.5.5 0 00.5.5h10a.5.5 0 00.5-.5V10"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
 
 interface DropZoneProps {
   onFile: (file: File) => void
@@ -60,13 +86,14 @@ export function DropZone({ onFile, disabled, className }: DropZoneProps) {
       onDragLeave={handleDragLeave}
     >
       <CardContent className="flex flex-col items-center justify-center gap-4 py-16 px-8">
-        <FileArchive className="size-12 text-muted-foreground" />
+        <DropZoneUploadIcon className="size-12 text-primary" />
         <div className="text-center space-y-1">
           <p className="text-lg font-medium">
             Drop your ChatGPT export ZIP here
           </p>
           <p className="text-sm text-muted-foreground">
-            or click to browse. The ZIP should contain <code className="rounded bg-muted px-1">conversations.json</code>, <code className="rounded bg-muted px-1">shared_conversations.json</code>, or <code className="rounded bg-muted px-1">conversations-000.json</code> (and similar).
+            or click to browse — supports <code className="rounded bg-muted px-1">conversations.json</code> and similar
+            formats
           </p>
         </div>
         <input

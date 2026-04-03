@@ -21,10 +21,8 @@ export function Home() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-8 p-6">
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">ChatGPT Archive</h1>
-        <p className="text-muted-foreground">
-          Import your exported conversations to browse, search, and export.
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight">Import</h1>
+        <p className="text-muted-foreground">Browse and search your AI conversation history.</p>
       </div>
 
       {progress.stage === 'done' ? (

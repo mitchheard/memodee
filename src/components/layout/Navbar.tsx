@@ -4,7 +4,7 @@ import { useThemeStore } from '@/store/useThemeStore'
 import { Button } from '@/components/ui/button'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/': 'ChatGPT Archive',
+  '/': 'Import',
   '/library': 'Library',
   '/analytics': 'Analytics',
   '/settings': 'Settings',
@@ -14,7 +14,7 @@ export function Navbar() {
   const location = useLocation()
   const theme = useThemeStore((s) => s.theme)
   const toggleTheme = useThemeStore((s) => s.toggleTheme)
-  const title = PAGE_TITLES[location.pathname] ?? 'ChatGPT Archive'
+  const title = PAGE_TITLES[location.pathname] ?? 'Memodee'
 
   return (
     <header className="h-12 shrink-0 border-b border-border bg-background flex items-center justify-between px-4">
